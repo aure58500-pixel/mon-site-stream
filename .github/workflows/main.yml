@@ -1,1 +1,25 @@
-
+name: Update Data
+on:
+  schedule:
+    - cron: '0 * * * *' # Toutes les heures
+  workflow_dispatch: # Permet de cliquer sur un bouton pour tester
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
+      - name: Run Scraper
+        run: python update_movies.py
+      - name: Commit changes
+        run: |
+          git config --global user.name 'MovieBot'
+          git config --global user.email 'bot@github.com'
+          git add movies.json
+          git commit -m "Auto-update films" || exit 0
+          git push
